@@ -1,5 +1,5 @@
-use std::net::SocketAddr;
 use std::path::PathBuf;
+use std::{env::args, net::SocketAddr};
 
 use axum::{Router, routing::get};
 #[cfg(debug_assertions)]
@@ -12,10 +12,7 @@ use axum::{
 use reqwest::StatusCode;
 
 pub async fn start(app: Router) {
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|value| value.parse::<u16>().ok())
-        .unwrap_or(3000);
+    let port = args().nth(1).unwrap_or("3000".to_string()).parse().unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
     let listener = tokio::net::TcpListener::bind(addr)
         .await
