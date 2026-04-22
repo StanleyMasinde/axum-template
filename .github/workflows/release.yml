@@ -177,7 +177,7 @@ jobs:
 
       - name: Upload release binary
         env:
-          ASSET_NAME: ${{ steps.package.outputs.bin_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
+          ASSET_NAME: ${{ matrix.platform }}.${{ matrix.archive_ext }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: gh release upload "${GITHUB_REF_NAME}" "${ASSET_NAME}" --clobber
