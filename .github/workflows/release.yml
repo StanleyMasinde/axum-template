@@ -153,7 +153,7 @@ jobs:
       - name: Package release binary
         env:
           ARCHIVE_EXT: ${{ matrix.archive_ext }}
-          ASSET_NAME: ${{ steps.package.outputs.bin_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
+          ASSET_NAME: ${{ matrix.platform }}.${{ matrix.archive_ext }}
           BIN_NAME: ${{ steps.package.outputs.bin_name }}
           EXE_SUFFIX: ${{ matrix.exe_suffix }}
           TARGET: ${{ matrix.target }}
