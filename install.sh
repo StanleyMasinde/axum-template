@@ -102,7 +102,7 @@ install_binary() {
         *) archive_ext="tar.gz" ;;
     esac
 
-    filename="${BIN_NAME}-${platform}.${archive_ext}"
+    filename="${platform}.${archive_ext}"
 
     echo "Installing ${BIN_NAME}"
     echo "Fetching release information..."
