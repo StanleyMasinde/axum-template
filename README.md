@@ -88,12 +88,12 @@ That workflow:
 - uploads both the frontend tarball and platform binaries to the same release
 - bakes the current GitHub repository into the binary as `GH_REPO`
 
-Binary archives are uploaded with installer-friendly names:
+Binary archives are uploaded with platform-only names:
 
-- `axum_template-linux-x86_64.tar.gz`
-- `axum_template-darwin-x86_64.tar.gz`
-- `axum_template-darwin-aarch64.tar.gz`
-- `axum_template-windows-x86_64.zip`
+- `linux-x86_64.tar.gz`
+- `darwin-x86_64.tar.gz`
+- `darwin-aarch64.tar.gz`
+- `windows-x86_64.zip`
 
 Typical release steps:
 

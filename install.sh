@@ -51,7 +51,7 @@ parse_asset() {
     json="$1"
     filename="$2"
 
-    asset_block=$(echo "$json" | sed -n "/\"name\"[[:space:]]*:[[:space:]]*\"${filename}\"/,/}/p")
+    asset_block=$(echo "$json" | sed -n "/\"name\"[[:space:]]*:[[:space:]]*\"${filename}\"/,/\"browser_download_url\"/p")
     url=$(echo "$asset_block" | grep '"browser_download_url"' | head -1 | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
     digest=$(echo "$asset_block" | grep '"digest"' | head -1 | sed 's/.*"sha256:\([^"]*\)".*/\1/')
 
@@ -124,7 +124,7 @@ install_binary() {
     if [ -z "$asset_info" ]; then
         echo "Error: Could not find asset '$filename' in release" >&2
         echo "Available assets:" >&2
-        echo "$release_json" | grep -o "\"name\"[[:space:]]*:[[:space:]]*\"${BIN_NAME}-[^\"]*\"" | sed 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/  - \1/' >&2
+        echo "$release_json" | grep -o "\"name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | sed 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/  - \1/' >&2
         exit 1
     fi
 
