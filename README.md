@@ -84,9 +84,16 @@ That workflow:
 - builds `frontend/dist`
 - packages it as `frontend.tar.gz`
 - creates a GitHub Release if needed
-- builds release binaries for Linux, macOS, and Windows
+- builds release binaries for Linux, macOS Intel, macOS Apple Silicon, and Windows
 - uploads both the frontend tarball and platform binaries to the same release
 - bakes the current GitHub repository into the binary as `GH_REPO`
+
+Binary archives are uploaded with installer-friendly names:
+
+- `axum_template-linux-x86_64.tar.gz`
+- `axum_template-darwin-x86_64.tar.gz`
+- `axum_template-darwin-aarch64.tar.gz`
+- `axum_template-windows-x86_64.zip`
 
 Typical release steps:
 
@@ -97,6 +104,22 @@ Typical release steps:
 
 When that binary version starts and assets are missing on disk, it fetches `frontend.tar.gz` from the matching release tag.
 
+## Install Script
+
+The repo includes [install.sh](./install.sh) for curl-pipe installs:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/StanleyMasinde/axum-template/main/install.sh | sh
+```
+
+To install a specific version:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/StanleyMasinde/axum-template/main/install.sh | sh -s -- v0.1.0
+```
+
+The script downloads the matching platform archive from GitHub Releases, verifies the SHA256 digest exposed by the GitHub Releases API when available, and installs the binary into `/usr/local/bin` by default.
+
 ## Template Readiness Checklist
 
 Before calling this ready for reuse, replace the remaining starter content:
@@ -106,3 +129,4 @@ Before calling this ready for reuse, replace the remaining starter content:
 - starter page copy in `frontend/src/pages/`
 - API routes in `src/server/mod.rs`
 - favicon and logo assets in `frontend/public/`
+- `REPO`, `BIN_NAME`, and `AXUM_TEMPLATE_INSTALL` in `install.sh`

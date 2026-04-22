@@ -98,10 +98,24 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x86_64
+            archive_ext: tar.gz
             exe_suffix: ""
-          - os: macos-latest
+          - os: macos-13
+            target: x86_64-apple-darwin
+            platform: darwin-x86_64
+            archive_ext: tar.gz
+            exe_suffix: ""
+          - os: macos-14
+            target: aarch64-apple-darwin
+            platform: darwin-aarch64
+            archive_ext: tar.gz
             exe_suffix: ""
           - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: windows-x86_64
+            archive_ext: zip
             exe_suffix: ".exe"
     runs-on: ${{ matrix.os }}
     env:
@@ -115,14 +129,12 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
 
-      - name: Build release binary
-        run: cargo build --locked --release
-
-      - name: Package release binary
-        env:
-          EXE_SUFFIX: ${{ matrix.exe_suffix }}
-          ARCHIVE_NAME: ${{ github.event.repository.name }}-${{ runner.os }}-${{ runner.arch }}.tar.gz
+      - name: Read package metadata
+        id: package
+        shell: bash
         run: |
           bin_name=$(grep '^name = ' Cargo.toml | head -n1 | sed -E 's/name = "(.*)"/\1/')
 
@@ -131,14 +143,41 @@ jobs:
             exit 1
           fi
 
-          bin_name="${bin_name}${EXE_SUFFIX}"
+          echo "bin_name=${bin_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Build release binary
+        env:
+          GH_REPO: ${{ github.repository }}
+        run: cargo build --locked --release --target "${{ matrix.target }}"
+
+      - name: Package release binary
+        env:
+          ARCHIVE_EXT: ${{ matrix.archive_ext }}
+          ASSET_NAME: ${{ steps.package.outputs.bin_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
+          BIN_NAME: ${{ steps.package.outputs.bin_name }}
+          EXE_SUFFIX: ${{ matrix.exe_suffix }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          packaged_bin="${BIN_NAME}${EXE_SUFFIX}"
           mkdir -p release
-          cp "target/release/${bin_name}" "release/${bin_name}"
-          tar -czf "${ARCHIVE_NAME}" -C release "${bin_name}"
+          cp "target/${TARGET}/release/${packaged_bin}" "release/${packaged_bin}"
+
+          case "${ARCHIVE_EXT}" in
+            tar.gz)
+              tar -czf "${ASSET_NAME}" -C release "${packaged_bin}"
+              ;;
+            zip)
+              powershell.exe -NoProfile -Command "Compress-Archive -Path 'release/${packaged_bin}' -DestinationPath '${ASSET_NAME}'"
+              ;;
+            *)
+              echo "Unsupported archive extension: ${ARCHIVE_EXT}" >&2
+              exit 1
+              ;;
+          esac
 
       - name: Upload release binary
         env:
+          ASSET_NAME: ${{ steps.package.outputs.bin_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          ARCHIVE_NAME: ${{ github.event.repository.name }}-${{ runner.os }}-${{ runner.arch }}.tar.gz
-        run: gh release upload "${GITHUB_REF_NAME}" "${ARCHIVE_NAME}" --clobber
+        run: gh release upload "${GITHUB_REF_NAME}" "${ASSET_NAME}" --clobber
