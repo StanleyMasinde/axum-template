@@ -12,7 +12,7 @@ The intended model is:
 This is useful for apps that should feel self-contained, but where you do not want to bloat the binary with bundled HTML, JS, and CSS.
 
 ## Demo
-A demo has been deployed [here](https://axum-template.stanleymasinde.com/another-page)
+A demo has been deployed [here](https://axum-template.stanleymasinde.com)
 
 ## How It Works
 
