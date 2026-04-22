@@ -38,10 +38,12 @@ fn api_routes() -> Router {
 
 #[cfg(not(debug_assertions))]
 pub fn app(asset_dir: PathBuf) -> Router {
-    use tower_http::services::ServeDir;
+    use tower_http::services::{ServeDir, ServeFile};
 
+    let index_file = asset_dir.join("index.html");
     let spa = ServeDir::new(&asset_dir)
-        .fallback(ServeDir::new(&asset_dir).append_index_html_on_directories(true));
+        .append_index_html_on_directories(true)
+        .fallback(ServeFile::new(index_file));
     // SPA fallback: any unmatched path returns index.html so Vue Router handles it
     let spa_fallback = axum::routing::get_service(spa);
 
