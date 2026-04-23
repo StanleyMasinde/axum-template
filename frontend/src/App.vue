@@ -11,6 +11,7 @@
       <nav class="nav">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/another-page">Another Page</RouterLink>
+        <RouterLink to="/health-check">Health check</RouterLink>
       </nav>
     </header>
 
